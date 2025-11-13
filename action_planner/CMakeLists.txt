@@ -36,10 +36,10 @@ install(PROGRAMS
   scripts/action_planner.py
   scripts/lifecycle_manager.py
   scripts/mission_controller.py
-  scripts/move_abaixo.py
-  scripts/move_acima.py
-  scripts/entrar.py
-  scripts/sair.py
+  scripts/path_planner.py
+  scripts/carregaritem.py
+  scripts/voa.py
+  scripts/entregaritem.py
   DESTINATION lib/${PROJECT_NAME})
 
 

@@ -1,36 +1,64 @@
-(define (domain elevador-dominio)
+(define (domain droneDomainV3)
 
-(:requirements :typing)
+    (:requirements :strips :typing :equality :numeric-fluents :durative-actions)
+    (:types
+        local drone item - object
+        base - local
+    )
+    
+    (:predicates ;;seção que contém a lista de variáveis de estado do modelo. 
+        (posicao ?dr - drone ?c - local)
+    )
+    
+    (:functions
+     (total-cost) - number
+     (dist-per_drone ?dr - drone) - number
+     (distancia ?orig - local ?dest - local) - number
+     (capacidade ?dr - drone) - number;; capacidade máxima do drone
+     (carga-total ?dr - drone) - number;; carga total atual do drone
+     (carga ?dr - drone ?i - item) - number;; quantidade de cada item no drone
+     (demandaItem ?i - item ?c - local) - number ;; demanda cliente item      
+    )
 
-(:types elevador passageiro andar -object)
+    (:durative-action entregarItem
+        :parameters (?dr - drone ?i - item ?l - local)
+        :duration (= ?duration 1)
+        :condition (and
+            (at start (posicao ?dr ?l))
+            (at start (>= (demandaItem ?i ?l) 1))
+            (at start (>= (carga ?dr ?i) 1))
+        )
+        :effect (and
+            (at end (decrease (demandaItem ?i ?l) 1))
+            (at end (decrease (carga ?dr ?i) 1))
+            (at end (decrease (carga-total ?dr) 1))
+        )
+    )
 
-(:predicates (passageiro-no-andar ?p -passageiro ?a -andar)
-             (passageiro-no-elevador ?p -passageiro ?e -elevador)
-             (elevador-no-andar ?e -elevador ?a -andar) (proximo ?n1 - andar ?a2 - andar)
-)
+    (:durative-action carregarItem
+        :parameters (?dr - drone ?i - item ?b - base)
+        :duration (= ?duration 1)
+        :condition (and
+            (at start (posicao ?dr ?b))
+            (at start (< (carga-total ?dr) (capacidade ?dr)))
+        )
+        :effect (and
+            (at end (increase (carga ?dr ?i) 1))
+            (at end (increase (carga-total ?dr) 1))
+        )
+    )
 
-(:action move_acima
-  :parameters (?e - elevador ?atual ?prox - andar)
-  :precondition (and(elevador-no-andar ?e ?atual) (proximo ?atual ?prox))
-  :effect (and(not(elevador-no-andar ?e ?atual))(elevador-no-andar ?e ?prox))
-)
-
-(:action move_abaixo
-  :parameters (?e -elevador ?atual ?prox - andar)
-  :precondition (and(elevador-no-andar ?e ?atual)(proximo ?prox ?atual))
-  :effect (and (not (elevador-no-andar ?e ?atual)) (elevador-no-andar ?e ?prox))
-)
-
-(:action entrar
-  :parameters (?p -passageiro ?numAndar -andar ?e -elevador )
-  :precondition ( and(elevador-no-andar ?e ?numAndar) (passageiro-no-andar ?p ?numAndar))
-  :effect (and(not(passageiro-no-andar ?p ?numAndar)) (passageiro-no-elevador ?p ?e))
-)
- 
-(:action sair
-  :parameters (?p -passageiro ?numAndar -andar ?e -elevador )
-  :precondition ( and(elevador-no-andar ?e ?numAndar)(passageiro-no-elevador ?p ?e))
-  :effect (and (passageiro-no-andar ?p ?numAndar) (not(passageiro-no-elevador ?p ?e)))
-)
-
+    (:durative-action voa
+        :parameters (?dr - drone ?origem ?destino - local)
+        :duration (= ?duration (distancia ?origem ?destino))
+        :condition (and
+            (at start (posicao ?dr ?origem))
+        )
+        :effect (and
+            (at start (not (posicao ?dr ?origem)))
+            (at end (posicao ?dr ?destino))
+            (at end (increase (total-cost) (distancia ?origem ?destino)))
+            (at end (increase (dist-per_drone ?dr) (distancia ?origem ?destino)))
+        )
+    )
 )

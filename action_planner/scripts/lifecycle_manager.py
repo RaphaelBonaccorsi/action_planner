@@ -191,19 +191,15 @@ nodes = [
         'depends_on': []
     },
     {
-        'node_name': 'move_abaixo',
+        'node_name': 'carregaritem',
         'depends_on': []
     },
     {
-        'node_name': 'move_acima',
+        'node_name': 'voa',
         'depends_on': []
     },
     {
-        'node_name': 'entrar',
-        'depends_on': []
-    },
-    {
-        'node_name': 'sair',
+        'node_name': 'entregaritem',
         'depends_on': []
     },
     {

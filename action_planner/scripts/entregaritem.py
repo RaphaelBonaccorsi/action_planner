@@ -17,7 +17,7 @@ import rclpy
 class ActionNodeExample(ActionExecutorBase):
 
     def __init__(self):
-        super().__init__("entrar")
+        super().__init__("entregaritem")
         self.get_logger().info("ActionNodeExample initialized")
 
     def on_configure_extension(self):
@@ -30,10 +30,10 @@ class ActionNodeExample(ActionExecutorBase):
 
     def new_goal(self, goal_request) -> bool:
         # Parametros da ação em goal_request.parameters
-        passageiro = goal_request.parameters[0]
-        andar = goal_request.parameters[1]
-        elevador = goal_request.parameters[2]
-        self.get_logger().info(f"Passageiro: {passageiro}, Andar: {andar}, Elevador: {elevador}")
+        drone = goal_request.parameters[0]
+        item = goal_request.parameters[1]
+        local = goal_request.parameters[2]
+        self.get_logger().info(f"Entregando\nDrone: {drone}, Item: {item}, Local: {local}")
 
         if not self._can_receive_new_goal:
             self.get_logger().info("Cannot receive new goal, action is already running")

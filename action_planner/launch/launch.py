@@ -60,29 +60,29 @@ def generate_launch_description():
         ),
         Node(
             package='action_planner',
-            executable='move_acima.py',
-            name='move_acima',
+            executable='path_planner.py',
+            name='path_planner',
             output='screen',
             parameters=[]
         ),
         Node(
             package='action_planner',
-            executable='move_abaixo.py',
-            name='move_abaixo',
+            executable='carregaritem.py',
+            name='carregaritem',
             output='screen',
             parameters=[]
         ),
         Node(
             package='action_planner',
-            executable='entrar.py',
-            name='entrar',
+            executable='voa.py',
+            name='voa',
             output='screen',
             parameters=[]
         ),
         Node(
             package='action_planner',
-            executable='sair.py',
-            name='sair',
+            executable='entregaritem.py',
+            name='entregaritem',
             output='screen',
             parameters=[]
         ),

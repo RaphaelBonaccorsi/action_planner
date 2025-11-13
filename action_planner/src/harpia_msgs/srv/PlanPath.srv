@@ -1,0 +1,9 @@
+# Request
+string origem
+string destino
+
+---
+# Response
+bool success
+string[] waypoints
+string message
