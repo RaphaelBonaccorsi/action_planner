@@ -66,7 +66,7 @@ class PathPlannerNode(Node):
         try:
             # TODO: Implementar algoritmo de planejamento de caminho (A*, Dijkstra, etc.)
             # Por enquanto, retorna caminho direto (origem -> destino)
-            waypoints = [self.location_coords[origem], self.location_coords[destino]]
+            waypoints = [origem, destino]
             
             response.success = True
             response.waypoints = waypoints

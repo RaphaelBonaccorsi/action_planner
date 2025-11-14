@@ -183,7 +183,7 @@ def simplify(axioms):
 
     # Remove duplicates from axiom conditions.
     for axiom in axioms:
-        axiom.condition.sort()
+        axiom.condition.sort(key=lambda x: (type(x).__name__, str(x)))
         remove_duplicates(axiom.condition)
 
     # Remove dominated axioms.
