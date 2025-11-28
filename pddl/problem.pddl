@@ -12,7 +12,7 @@
         (= (dist-per_drone quad) 0)
         
         ; Capacidade e carga do drone
-        (= (capacidade quad) 2)
+        (= (capacidade quad) 2) ; bug comentado em sala que com capacidade 2 ele carrega até 3
         (= (carga-total quad) 0)
         (= (carga quad item1) 0)
         (= (carga quad item2) 0)
