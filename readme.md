@@ -4,13 +4,38 @@ docker build -t action_planner .
 ```
 
 # Rodar com o diretório pddl montado e porta da visualização:
-```
+
+## Opção 1: Modo Interativo (manual)
+```bash
 docker run -it -v ./pddl:/pddl -p 5007:5007 action_planner
 ```
-
-# Rodar o sistema dentro do container:
-```
+Depois, dentro do container, execute:
+```bash
 ros2 launch launch/launch.py
+```
+
+## Opção 2: Inicialização Automática
+```bash
+docker run -it -v ./pddl:/pddl -p 5007:5007 action_planner /usr/local/bin/start-ros2.sh
+```
+Este comando já inicia o ROS2 automaticamente ao entrar no container.
+
+## Opção 3: Modo Background (daemon)
+```bash
+docker run -d --name action_planner_running -v ./pddl:/pddl -p 5007:5007 action_planner /usr/local/bin/start-ros2.sh
+```
+Para ver os logs:
+```bash
+docker logs -f action_planner_running
+```
+Para acessar o container:
+```bash
+docker exec -it action_planner_running /bin/bash
+```
+Para parar:
+```bash
+docker stop action_planner_running
+docker rm action_planner_running
 ```
 
 # Acessar a visualização web:

@@ -18,28 +18,35 @@ class PathPlannerNode(Node):
     def __init__(self):
         super().__init__('path_planner_node')
         
-        # Definição do mapa 2D (grid 10x10 como exemplo)
+        # Definição do mapa 2D (grid 15x15 ampliado)
         # 0 = espaço livre, 1 = obstáculo
         self.grid_map = np.array([          # y
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # 0
-            [0, 0, 0, 1, 1, 1, 0, 0, 0, 0], # 1
-            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0], # 2
-            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0], # 3
-            [0, 0, 0, 0, 0, 0, 1, 1, 0, 0], # 4
-            [0, 0, 0, 0, 0, 0, 1, 1, 0, 0], # 5
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # 6
-            [0, 0, 1, 1, 0, 0, 0, 0, 0, 0], # 7
-            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0], # 8
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # 9
-        #x-> 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # 0
+            [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], # 1
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0], # 2
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0], # 3
+            [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0], # 4
+            [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0], # 5
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # 6
+            [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # 7
+            [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # 8
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], # 9
+            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], # 10 - Barreira horizontal
+            [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], # 11 - Área isolada
+            [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1], # 12 - Área isolada
+            [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1], # 13 - Barreira horizontal
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # 14
+        #x-> 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14
         ])
         
         # Mapeamento de locais para coordenadas (x, y) no grid
         self.location_coords = {
-            'base1': (1, 1),    # Base no canto superior esquerdo
-            'casaa': (8, 2),    # Casa A no lado direito superior
-            'casab': (3, 9),    # Casa B no lado esquerdo inferior
-            'casac': (8, 8)     # Casa C no canto inferior direito
+            'base1': (1, 1),     # Base no canto superior esquerdo
+            'casaa': (13, 2),    # Casa A no lado direito superior
+            'casab': (3, 14),    # Casa B no lado esquerdo inferior
+            'casac': (13, 8),    # Casa C no lado direito meio
+            'casad': (11, 12),   # Casa D - ISOLADA (dentro da área cercada)
+            'deposito': (1, 7)   # Depósito no lado esquerdo
         }
         
         # Inicializa o visualizador (módulo separado)

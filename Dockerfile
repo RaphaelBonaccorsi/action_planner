@@ -44,6 +44,14 @@ RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
     echo "source /home/action_planner/install/setup.bash" >> ~/.bashrc && \
     echo "source /home/action_planner/src/harpia_msgs/install/setup.bash" >> ~/.bashrc
 
+# Create startup script for auto-launch
+RUN echo '#!/bin/bash\n\
+source /opt/ros/humble/setup.bash\n\
+source /home/action_planner/install/setup.bash\n\
+source /home/action_planner/src/harpia_msgs/install/setup.bash\n\
+ros2 launch launch/launch.py' > /usr/local/bin/start-ros2.sh && \
+    chmod +x /usr/local/bin/start-ros2.sh
+
 # Expose port for web visualizer
 EXPOSE 5007
 
