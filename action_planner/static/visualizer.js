@@ -59,8 +59,9 @@ class PathPlannerVisualizer {
         const rows = this.gridData.grid_size.rows;
         const cols = this.gridData.grid_size.cols;
         
+        // Aumenta área de exibição para evitar corte dos nomes dos locais
         this.canvas.width = cols * this.cellSize + this.padding * 2;
-        this.canvas.height = rows * this.cellSize + this.padding * 2;
+        this.canvas.height = rows * this.cellSize + this.padding * 2 + 30; // +30px extra na vertical
     }
     
     drawGrid(pathData = null) {
@@ -88,10 +89,10 @@ class PathPlannerVisualizer {
                 ctx.strokeStyle = this.colors.grid;
                 ctx.strokeRect(cellX, cellY, this.cellSize, this.cellSize);
                 
-                // Coordenadas
-                ctx.fillStyle = this.colors.text;
+                // Coordenadas - ajustadas para ficarem mais à direita dentro do quadrado
+                ctx.fillStyle = '#000000'; // Preto para melhor contraste
                 ctx.font = '10px sans-serif';
-                ctx.fillText(`${x},${y}`, cellX + 3, cellY + 12);
+                ctx.fillText(`${x},${y}`, cellX + 12, cellY + 12);
             }
         }
         
@@ -120,11 +121,19 @@ class PathPlannerVisualizer {
         ctx.lineWidth = 2;
         ctx.stroke();
         
-        // Nome do local
-        ctx.fillStyle = this.colors.text;
+        // Nome do local com borda branca para visibilidade
+        // Posicionado mais próximo ao círculo para ficar dentro do quadrado
         ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(name, centerX, centerY + this.cellSize / 2 + 15);
+        
+        // Desenha borda branca
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.strokeText(name, centerX, centerY + 18);
+        
+        // Desenha texto preto por cima
+        ctx.fillStyle = '#000000';
+        ctx.fillText(name, centerX, centerY + 18);
     }
     
     drawPath(pathData) {
