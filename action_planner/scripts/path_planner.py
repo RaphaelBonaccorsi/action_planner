@@ -10,6 +10,9 @@ import json
 import numpy as np
 import heapq
 
+# Importa o módulo de visualização
+from path_visualizer import PathVisualizer, PathVisualizerServer
+
 
 class PathPlannerNode(Node):
     def __init__(self):
@@ -38,6 +41,17 @@ class PathPlannerNode(Node):
             'casab': (3, 9),    # Casa B no lado esquerdo inferior
             'casac': (8, 8)     # Casa C no canto inferior direito
         }
+        
+        # Inicializa o visualizador (módulo separado)
+        self.visualizer = PathVisualizer(self.grid_map, self.location_coords)
+        self.visualizer_server = PathVisualizerServer(self.visualizer, port=5007, host='0.0.0.0')
+        
+        # Inicia o servidor web em thread separada
+        if self.visualizer_server.start():
+            self.get_logger().info('🌐 Path Visualizer Server started at http://0.0.0.0:5007')
+            self.get_logger().info('   Access from host: http://localhost:5007')
+        else:
+            self.get_logger().warn('Failed to start Path Visualizer Server')
         
         # Create service server
         self.plan_path_service = self.create_service(
@@ -180,6 +194,10 @@ class PathPlannerNode(Node):
                 response.waypoints = []
                 response.message = f'No path found from {origem} to {destino}'
                 self.get_logger().warn(response.message)
+                
+                # Adiciona ao visualizador (falha)
+                self.visualizer.add_path_result(origem, destino, None, False, response.message)
+                
                 return response
             
             # Converte coordenadas de volta para nomes de locais
@@ -199,11 +217,17 @@ class PathPlannerNode(Node):
             
             self.get_logger().info(f'Path planned with {len(path)} points: {waypoints}')
             
+            # Adiciona ao visualizador (sucesso)
+            self.visualizer.add_path_result(origem, destino, path, True, response.message)
+            
         except Exception as e:
             response.success = False
             response.waypoints = []
             response.message = f'Path planning failed: {str(e)}'
             self.get_logger().error(f'Path planning error: {e}')
+            
+            # Adiciona ao visualizador (erro)
+            self.visualizer.add_path_result(origem, destino, None, False, str(e))
         
         return response
 

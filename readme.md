@@ -1,15 +1,30 @@
 # Buildar container:
-``
+```
 docker build -t action_planner .
-``
-# Rodar com o diretório pddl montado:
-``
-docker run -it -v ./pddl:/pddl action_planner
-``
+```
+
+# Rodar com o diretório pddl montado e porta da visualização:
+```
+docker run -it -v ./pddl:/pddl -p 5007:5007 action_planner
+```
+
 # Rodar o sistema dentro do container:
-``
+```
 ros2 launch launch/launch.py
-``
+```
+
+# Acessar a visualização web:
+Após iniciar o sistema, abra no navegador:
+```
+http://localhost:5007
+```
+
+A interface exibirá:
+- Mapa com obstáculos
+- Caminho planejado em tempo real
+- Histórico de todas as execuções
+- Pontos de origem e destino
+
 # Passo a passo para criar novos actions nodes/mudar problem e domain:
 - Criar os actions nodes dentro da pasta script, atualizar o nome da ação na linha:
 
