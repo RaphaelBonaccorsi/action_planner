@@ -86,53 +86,104 @@ ros2 launch launch/launch.py
 
 ## 🏗️ Arquitetura
 
+```mermaid
+graph TB
+    LC[🔧 Lifecycle Manager<br/><i>Gerencia configure/activate de todos os nós</i>]
+    
+    MC[📋 Mission Controller]
+    
+    subgraph APNode["🎯 Action Planner Node"]
+        direction TB
+        APS[ActionServer<br/>/action_planner/execute_plan]
+        SOLVER[🧠 PDDL Solver<br/>OPTIC/TFD]
+        APE[⚙️ Executor]
+        
+        APS --> SOLVER --> APE
+    end
+    
+    CARR[🔹 Carregar Item<br/>ActionServer: /action/carregaritem]
+    VOA[🔹 Voa<br/>ActionServer: /action/voa]
+    ENT[🔹 Entregar Item<br/>ActionServer: /action/entregaritem]
+    
+    PP[🗺️ Path Planner<br/>ServiceServer: /path_planner/plan_path]
+    
+    FLASK[⚡ Flask Server<br/>Thread daemon]
+    UI[🖥️ Interface Web<br/>localhost:5007]
+    
+    %% Mission flow
+    MC ==>|ActionClient<br/>send_goal| APS
+    
+    %% Action execution
+    APE ==>|ActionClient<br/>send_goal| CARR
+    APE ==>|ActionClient<br/>send_goal| VOA
+    APE ==>|ActionClient<br/>send_goal| ENT
+    
+    %% Path planning
+    VOA -->|ServiceClient| PP
+    
+    %% Visualization
+    PP -->|integrado| FLASK
+    FLASK --> UI
+    
+    style LC fill:#e1f5ff,stroke:#01579b,stroke-width:3px
+    style MC fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    style APNode fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
+    style CARR fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    style VOA fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    style ENT fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    style PP fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    style FLASK fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    style UI fill:#e0f2f1,stroke:#00695c,stroke-width:2px
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     Mission Controller                      │
-│              (Coordena execução da missão)                  │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Action Planner                           │
-│   (Gera plano PDDL usando OPTIC/TFD solvers)                │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│               Action Planner Executor                       │
-│        (Gerencia execução sequencial de ações)              │
-└───┬──────────────┬──────────────┬──────────────┬────────────┘
-    │              │              │              │
-    ▼              ▼              ▼              ▼
-┌─────────┐    ┌─────────┐    ┌─────────┐    ┌────────────────┐
-│ Carregar│    │   Voa   │    │Entregar │    │  Path Planner  │
-│  Item   │    │         │    │  Item   │    │  (Dijkstra +   │
-│ Action  │    │ Action  │    │ Action  │    │  Visualizer)   │
-└─────────┘    └────┬────┘    └─────────┘    └────────┬───────┘
-                    │                                 │
-                    └────────────────┬────────────────┘
-                                     ▼
-                      ┌──────────────────────────────┐
-                      │   Path Visualizer Server     │
-                      │    (Flask REST API)          │
-                      └──────────────┬───────────────┘
-                                     ▼
-                      ┌──────────────────────────────┐
-                      │   Web Interface (Canvas)     │
-                      │   http://localhost:5007      │
-                      └──────────────────────────────┘
-```
+
+**📖 Legenda de Comunicação ROS2:**
+- **ActionClient/send_goal**: Cliente ROS2 Action que envia requisição (goal) para um ActionServer executar tarefa assíncrona
+- **ActionServer**: Servidor que recebe goals, executa ações e retorna resultados/feedback
+- **ServiceClient**: Cliente que faz requisição síncrona a um ServiceServer e aguarda resposta
+- **ServiceServer**: Servidor que processa requisições síncronas e retorna respostas imediatas
+
+### 🔄 Fluxo de Execução
+
+1. **Inicialização**: Lifecycle Manager configura e ativa todos os nós
+2. **Disparo**: Mission Controller envia goal para Action Planner
+3. **Planejamento**: Solver PDDL gera sequência de ações
+4. **Execução Sequencial**: Executor cria ActionClients dinamicamente e executa:
+   - Carregar item → Voa → Entregar item
+5. **Navegação**: Action "Voa" solicita rota ao Path Planner via service
+6. **Visualização**: Path Planner atualiza servidor Flask em tempo real
 
 ### 🔑 Componentes Principais
 
-- **Mission Controller**: Ponto de entrada que dispara o planejamento de missões
-- **Action Planner**: Interface com solvers PDDL (OPTIC/TFD) para geração de planos
-- **Action Planner Executor**: Orquestra execução de ações respeitando precondições
-- **Path Planner**: Implementa Dijkstra para navegação com obstáculos
-- **Action Nodes**: Executores específicos (carregar, voar, entregar)
-- **Lifecycle Manager**: Gerencia transições de estado dos nós ROS2
-- **Path Visualizer**: Módulo modular de visualização web (Flask + Canvas)
+**🔧 Lifecycle Manager**
+- Gerencia transições de estado (configure → activate)
+- Controla: Mission Controller, Action Planner, Action Nodes, Path Planner
+
+**📋 Mission Controller**
+- ActionClient para `/action_planner/execute_plan`
+- Dispara execução da missão
+
+**🎯 Action Planner (Lifecycle Node)**
+- **ActionServer**: Recebe goals de execução
+- **PDDL Solver**: Gera plano usando OPTIC/TFD
+- **Executor**: Orquestra execução sequencial
+  - Cria ActionClients dinamicamente para cada ação
+  - Valida precondições e aplica efeitos
+  - Gerencia estado global (Action Planner Memory)
+
+**🔹 Action Nodes (Lifecycle independentes)**
+- `carregaritem`: ActionServer `/action/carregaritem`
+- `voa`: ActionServer `/action/voa` + ServiceClient para path planning
+- `entregaritem`: ActionServer `/action/entregaritem`
+
+**🗺️ Path Planner (Service Server)**
+- ServiceServer: `/path_planner/plan_path`
+- Algoritmo Dijkstra em grid 15x15
+- Integra servidor Flask para visualização
+
+**🌐 Web Visualizer**
+- Flask REST API em thread daemon
+- Interface HTML5 Canvas
+- Porta: `http://localhost:5007`
 
 ## 🎨 Visualizador Web
 
