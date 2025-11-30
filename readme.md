@@ -125,15 +125,15 @@ graph TB
     PP -->|integrado| FLASK
     FLASK --> UI
     
-    style LC fill:#e1f5ff,stroke:#01579b,stroke-width:3px
-    style MC fill:#fff9c4,stroke:#f57f17,stroke-width:2px
-    style APNode fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
-    style CARR fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
-    style VOA fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
-    style ENT fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
-    style PP fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    style FLASK fill:#e0f2f1,stroke:#00695c,stroke-width:2px
-    style UI fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    style LC fill:#4fc3f7,stroke:#0277bd,stroke-width:3px,color:#000
+    style MC fill:#fff176,stroke:#f57f17,stroke-width:2px,color:#000
+    style APNode fill:#81c784,stroke:#2e7d32,stroke-width:3px,color:#000
+    style CARR fill:#ce93d8,stroke:#6a1b9a,stroke-width:2px,color:#000
+    style VOA fill:#ce93d8,stroke:#6a1b9a,stroke-width:2px,color:#000
+    style ENT fill:#ce93d8,stroke:#6a1b9a,stroke-width:2px,color:#000
+    style PP fill:#f48fb1,stroke:#c2185b,stroke-width:2px,color:#000
+    style FLASK fill:#4db6ac,stroke:#00695c,stroke-width:2px,color:#000
+    style UI fill:#4db6ac,stroke:#00695c,stroke-width:2px,color:#000
 ```
 
 **📖 Legenda de Comunicação ROS2:**
