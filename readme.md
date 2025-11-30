@@ -3,7 +3,6 @@
 [![ROS2](https://img.shields.io/badge/ROS2-Humble-blue.svg)](https://docs.ros.org/en/humble/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker)](https://www.docker.com/)
 [![Python](https://img.shields.io/badge/Python-3.10-3776AB.svg?logo=python)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 Sistema autônomo de planejamento e execução de missões para drones usando **ROS2**, **PDDL** (Planning Domain Definition Language) e **algoritmo de Dijkstra** para pathfinding com visualização web em tempo real.
 
@@ -11,121 +10,19 @@ Sistema autônomo de planejamento e execução de missões para drones usando **
 
 ## 📑 Índice
 
-- [Características](#-características)
-- [Demonstração](#-demonstração)
-- [Arquitetura](#-arquitetura)
 - [Pré-requisitos](#-pré-requisitos)
 - [Instalação e Execução](#-instalação-e-execução)
+- [Arquitetura](#-arquitetura)
 - [Visualizador Web](#-visualizador-web)
 - [Desenvolvimento](#-desenvolvimento)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
-- [Contribuindo](#-contribuindo)
-- [Licença](#-licença)
-
-## ✨ Características
-
-### 🎯 Planejamento Automático de Missões
-- **PDDL Planning**: Geração automática de planos de ação baseados em objetivos
-- **Execução Sequencial**: Coordenação inteligente de ações (carregar item, voar, entregar)
-- **Lifecycle Management**: Gerenciamento robusto do ciclo de vida dos nós ROS2
-- **Tratamento de Falhas**: Sistema resiliente que continua execução mesmo após falhas em ações individuais
-
-### 🗺️ Pathfinding Inteligente
-- **Algoritmo de Dijkstra**: Busca otimizada de caminhos com suporte a movimento diagonal
-- **Prevenção de Colisões**: Detecção automática de obstáculos e corner-cutting prevention
-- **Grid Configurável**: Mapa 15x15 customizável com múltiplas localizações
-- **Custos Ponderados**: Movimento cardinal (1.0) e diagonal (1.414) para caminhos realistas
-
-### 🎨 Visualização em Tempo Real
-- **Interface Web Moderna**: Dashboard interativo com Canvas HTML5
-- **Atualização Automática**: Polling a cada 1 segundo para feedback imediato
-- **Histórico Completo**: Registro das últimas 100 execuções com timestamps
-- **Análise Visual**: 
-  - Grid com obstáculos e espaços livres
-  - Caminhos planejados destacados em verde
-  - Origem (azul) e destino (vermelho) claramente marcados
-  - Localizações conhecidas com identificadores visuais
-  - Coordenadas e labels otimizados para legibilidade
-
-### 🔧 DevOps e Containerização
-- **Docker-Ready**: Ambiente completamente containerizado
-- **Múltiplos Modos de Execução**: Interativo, automático e daemon
-- **Volume Mounting**: PDDL files facilmente editáveis sem rebuild
-- **Port Mapping**: Acesso direto ao visualizador web
-
-## 🎬 Demonstração
-
-O sistema executa missões complexas de forma autônoma:
-
-1. **Planejamento**: Gera sequência de ações baseada no problema PDDL
-2. **Pathfinding**: Calcula rota otimizada entre localizações evitando obstáculos
-3. **Execução**: Coordena ações de carregar, voar e entregar itens
-4. **Visualização**: Exibe em tempo real todos os caminhos planejados
-5. **Resiliência**: Continua missão mesmo se uma localização for inalcançável
-
-**Exemplo de missão**:
-- Carregar 3 itens na base
-- Voar para casaA, entregar itens
-- Retornar à base, carregar mais itens
-- Tentar voar para casaD (isolada) - falha graciosamente
-- Continuar para outras localizações com sucesso
-
-## 🏗️ Arquitetura
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Mission Controller                       │
-│              (Coordena execução da missão)                   │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Action Planner                            │
-│   (Gera plano PDDL usando OPTIC/TFD solvers)                │
-└────────────────────┬────────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│               Action Planner Executor                        │
-│        (Gerencia execução sequencial de ações)              │
-└───┬──────────────┬──────────────┬──────────────┬────────────┘
-    │              │              │              │
-    ▼              ▼              ▼              ▼
-┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────────────┐
-│ Carregar│  │   Voa   │  │Entregar │  │  Path Planner   │
-│  Item   │  │         │  │  Item   │  │  (Dijkstra +    │
-│ Action  │  │ Action  │  │ Action  │  │  Visualizer)    │
-└─────────┘  └────┬────┘  └─────────┘  └────────┬────────┘
-                  │                              │
-                  └──────────────┬───────────────┘
-                                 ▼
-                  ┌──────────────────────────────┐
-                  │   Path Visualizer Server     │
-                  │    (Flask REST API)          │
-                  └──────────────┬───────────────┘
-                                 ▼
-                  ┌──────────────────────────────┐
-                  │   Web Interface (Canvas)     │
-                  │   http://localhost:5007      │
-                  └──────────────────────────────┘
-```
-
-### 🔑 Componentes Principais
-
-- **Mission Controller**: Ponto de entrada que dispara o planejamento de missões
-- **Action Planner**: Interface com solvers PDDL (OPTIC/TFD) para geração de planos
-- **Action Planner Executor**: Orquestra execução de ações respeitando precondições
-- **Path Planner**: Implementa Dijkstra para navegação com obstáculos
-- **Action Nodes**: Executores específicos (carregar, voar, entregar)
-- **Lifecycle Manager**: Gerencia transições de estado dos nós ROS2
-- **Path Visualizer**: Módulo modular de visualização web (Flask + Canvas)
 
 ## 📋 Pré-requisitos
 
 - **Docker** (recomendado) OU
 - **ROS2 Humble**
 - **Python 3.10+**
-- **Navegador Web moderno** (Chrome, Firefox, Safari, Edge)
+- **Navegador Web** (Chrome, Firefox, Safari, Edge)
 
 ## 🚀 Instalação e Execução
 
@@ -171,7 +68,7 @@ docker rm action_planner_running
 
 ```bash
 # Clonar repositório
-git clone <repository-url>
+git clone https://github.com/RaphaelBonaccorsi/action_planner.git
 cd action_planner
 
 # Source ROS2
@@ -186,6 +83,56 @@ source install/setup.bash
 # Executar
 ros2 launch launch/launch.py
 ```
+
+## 🏗️ Arquitetura
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Mission Controller                      │
+│              (Coordena execução da missão)                  │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Action Planner                           │
+│   (Gera plano PDDL usando OPTIC/TFD solvers)                │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│               Action Planner Executor                       │
+│        (Gerencia execução sequencial de ações)              │
+└───┬──────────────┬──────────────┬──────────────┬────────────┘
+    │              │              │              │
+    ▼              ▼              ▼              ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌────────────────┐
+│ Carregar│    │   Voa   │    │Entregar │    │  Path Planner  │
+│  Item   │    │         │    │  Item   │    │  (Dijkstra +   │
+│ Action  │    │ Action  │    │ Action  │    │  Visualizer)   │
+└─────────┘    └────┬────┘    └─────────┘    └────────┬───────┘
+                    │                                 │
+                    └────────────────┬────────────────┘
+                                     ▼
+                      ┌──────────────────────────────┐
+                      │   Path Visualizer Server     │
+                      │    (Flask REST API)          │
+                      └──────────────┬───────────────┘
+                                     ▼
+                      ┌──────────────────────────────┐
+                      │   Web Interface (Canvas)     │
+                      │   http://localhost:5007      │
+                      └──────────────────────────────┘
+```
+
+### 🔑 Componentes Principais
+
+- **Mission Controller**: Ponto de entrada que dispara o planejamento de missões
+- **Action Planner**: Interface com solvers PDDL (OPTIC/TFD) para geração de planos
+- **Action Planner Executor**: Orquestra execução de ações respeitando precondições
+- **Path Planner**: Implementa Dijkstra para navegação com obstáculos
+- **Action Nodes**: Executores específicos (carregar, voar, entregar)
+- **Lifecycle Manager**: Gerencia transições de estado dos nós ROS2
+- **Path Visualizer**: Módulo modular de visualização web (Flask + Canvas)
 
 ## 🎨 Visualizador Web
 
@@ -232,26 +179,24 @@ http://localhost:5007
 
 ### 💡 Valor Agregado
 
-O visualizador web adiciona:
+O visualizador web oferece:
 
-1. **Transparência Operacional**: Visibilidade completa do processo de pathfinding
-2. **Debug Facilitado**: Identificação rápida de problemas em rotas
-3. **Análise Histórica**: Comparação de execuções para otimização
-4. **Demonstração Visual**: Ferramenta educacional e de apresentação
-5. **Monitoramento Remoto**: Acesso via navegador de qualquer dispositivo na rede
-6. **Modularidade**: Implementação separada não impacta lógica de negócio
+- **Transparência Operacional**: Visibilidade completa do processo de pathfinding
+- **Debug Facilitado**: Identificação rápida de problemas em rotas
+- **Análise Histórica**: Comparação de execuções para otimização
+- **Monitoramento Remoto**: Acesso via navegador de qualquer dispositivo na rede
 
-### 🎨 Tecnologias do Visualizador
+### 🎨 Tecnologias
 
 - **Backend**: Flask 3.0.0 + Flask-CORS 4.0.0
 - **Frontend**: HTML5 Canvas + Vanilla JavaScript
-- **Estilo**: CSS3 com gradientes e animações
 - **Arquitetura**: REST API thread-safe
-- **Design**: Responsivo e acessível
 
 ## 🛠️ Desenvolvimento
 
 ### Criar Novos Action Nodes
+
+> **Nota**: Os diretórios `templates/` e `static/` contêm arquivos do visualizador web que são acessados em runtime pelo servidor Flask e não precisam ser instalados pelo CMakeLists.
 
 1. **Criar script Python** em `action_planner/scripts/`:
 
@@ -277,6 +222,8 @@ install(PROGRAMS
   scripts/minha_acao.py
   DESTINATION lib/${PROJECT_NAME})
 ```
+
+> **Nota**: Scripts auxiliares como `path_visualizer.py`, `action_planner_executor.py`, `action_planner_memory.py` e `action_executor_base.py` são importados pelos nós principais e não precisam ser listados no `install(PROGRAMS ...)`.
 
 3. **Registrar no Lifecycle Manager** (`scripts/lifecycle_manager.py`):
 
@@ -360,8 +307,8 @@ action_planner/
 │   │   ├── carregaritem.py               # Action: carregar item
 │   │   ├── entregaritem.py               # Action: entregar item
 │   │   ├── voa.py                        # Action: voar entre locais
-│   │   ├── path_planner.py               # Dijkstra pathfinding
-│   │   ├── path_visualizer.py            # Módulo de visualização
+│   │   ├── path_planner.py               # Dijkstra pathfinding + visualizer
+│   │   ├── path_visualizer.py            # Módulo de visualização Flask
 │   │   ├── lifecycle_manager.py          # Gerenciador de lifecycle
 │   │   └── mission_controller.py         # Controlador de missões
 │   ├── src/harpia_msgs/                  # Mensagens e actions customizadas
@@ -373,6 +320,7 @@ action_planner/
 │   ├── static/
 │   │   ├── style.css                     # Estilos
 │   │   └── visualizer.js                 # Lógica frontend
+│   ├── output/                           # Diretório para saídas do planner
 │   ├── CMakeLists.txt
 │   └── package.xml
 ├── pddl/
@@ -382,27 +330,6 @@ action_planner/
 ├── demo.gif                               # Demonstração visual
 └── readme.md                              # Este arquivo
 ```
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Para contribuir:
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
-4. Push para a branch (`git push origin feature/MinhaFeature`)
-5. Abra um Pull Request
-
-### 📝 Guidelines
-
-- Siga PEP 8 para código Python
-- Adicione testes quando aplicável
-- Atualize documentação relevante
-- Use commits semânticos
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 
@@ -414,7 +341,5 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ![Python](https://img.shields.io/badge/Python-3.10-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-
-**Dúvidas ou sugestões?** Abra uma [issue](../../issues) ou entre em contato!
 
 </div>
