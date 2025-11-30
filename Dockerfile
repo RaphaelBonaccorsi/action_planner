@@ -19,7 +19,9 @@ RUN apt-get update && apt-get install -y \
 # Install Python dependencies with compatible versions
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install --no-cache-dir "numpy==1.26.4" && \
-    python3 -m pip install --no-cache-dir unified_planning
+    python3 -m pip install --no-cache-dir unified_planning && \
+    python3 -m pip install --no-cache-dir flask==3.0.0 && \
+    python3 -m pip install --no-cache-dir flask-cors==4.0.0
 
 COPY action_planner /home/action_planner
 WORKDIR /home/action_planner
@@ -41,5 +43,16 @@ RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
     echo "source /home/action_planner/install/setup.bash" >> ~/.bashrc && \
     echo "source /home/action_planner/src/harpia_msgs/install/setup.bash" >> ~/.bashrc
+
+# Create startup script for auto-launch
+RUN echo '#!/bin/bash\n\
+source /opt/ros/humble/setup.bash\n\
+source /home/action_planner/install/setup.bash\n\
+source /home/action_planner/src/harpia_msgs/install/setup.bash\n\
+ros2 launch launch/launch.py' > /usr/local/bin/start-ros2.sh && \
+    chmod +x /usr/local/bin/start-ros2.sh
+
+# Expose port for web visualizer
+EXPOSE 5007
 
 CMD ["/bin/bash"]

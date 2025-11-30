@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Path Planner Visualizer</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ Path Planner Visualizer</h1>
+            <div class="status">
+                <span id="status-indicator" class="status-dot"></span>
+                <span id="status-text">Conectando...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Seção do Grid/Mapa -->
+            <div class="grid-section">
+                <div class="section-header">
+                    <h2>Mapa e Caminho Atual</h2>
+                    <div class="info">
+                        <span id="current-path-info">Aguardando planejamento...</span>
+                    </div>
+                </div>
+                <canvas id="gridCanvas"></canvas>
+                <div class="legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #34495e;"></span>
+                        <span>Obstáculo</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #ecf0f1;"></span>
+                        <span>Espaço Livre</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #3498db;"></span>
+                        <span>Origem</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #e74c3c;"></span>
+                        <span>Destino</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #2ecc71;"></span>
+                        <span>Caminho</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #f39c12;"></span>
+                        <span>Locais</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção do Histórico -->
+            <div class="history-section">
+                <div class="section-header">
+                    <h2>Histórico de Planejamentos</h2>
+                    <button id="clearHistory" class="btn-clear">Limpar Visualização</button>
+                </div>
+                <div id="historyList" class="history-list">
+                    <p class="empty-message">Nenhum planejamento realizado ainda.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/visualizer.js"></script>
+</body>
+</html>

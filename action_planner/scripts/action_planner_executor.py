@@ -181,6 +181,17 @@ class ActionPlannerExecutor:
             goal_handle = future.result()
             if not goal_handle.accepted:
                 self.get_logger().warn('Goal rejected by server')
+                # Log the rejection but mark action as completed to allow plan to continue
+                self.get_logger().error(f"Action {action['name']} with args {action['args']} was rejected")
+                self.get_logger().info(f"Skipping failed action and continuing with remaining actions...")
+                
+                # Mark action as completed with failure
+                action['state'] = ActionState.COMPLETED
+                self.memory.apply_effects(action['name'], action['args'], ["at end"])
+                self.get_logger().info(f"action {action['name']} marked as completed (failed)")
+                
+                # Try to start next action
+                self.check_if_can_start_action()
                 return
 
             _goal_handle = goal_handle
